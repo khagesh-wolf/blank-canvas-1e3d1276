@@ -1455,11 +1455,12 @@ export default function Admin() {
 
         {/* Settings */}
         {tab === 'settings' && (
-          <div className="max-w-4xl">
+          <div className="max-w-5xl">
             <h2 className="text-2xl font-bold mb-6">Settings</h2>
             <div className="grid md:grid-cols-2 gap-6">
-              {/* Left Column - General Settings */}
+              {/* Left Column */}
               <div className="space-y-4">
+                {/* General Settings */}
                 <div className="bg-card rounded-xl border border-border p-5">
                   <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
                     <Settings className="w-5 h-5 text-primary" />
@@ -1488,18 +1489,15 @@ export default function Admin() {
                           variant="outline" 
                           size="sm"
                           onClick={() => {
-                            // Try to get hostname for mDNS
                             const hostname = window.location.hostname;
                             const port = window.location.port;
                             const protocol = window.location.protocol;
                             
-                            // If already using .local or a domain, keep it
                             if (hostname.endsWith('.local') || hostname.includes('.')) {
                               const url = `${protocol}//${hostname}${port ? ':' + port : ''}`;
                               updateSettings({ baseUrl: url });
                               toast.success('Base URL set to: ' + url);
                             } else {
-                              // Show dialog to enter hostname
                               const computerName = prompt(
                                 'Enter your computer hostname (found in System Settings):\n\n' +
                                 'Windows: Settings → System → About → Device name\n' +
@@ -1519,19 +1517,16 @@ export default function Admin() {
                         </Button>
                       </div>
                       <p className="text-xs text-muted-foreground mt-1">
-                        Use hostname.local instead of IP to avoid issues when IP changes. 
-                        Click "Use Hostname" to set up.
+                        Use hostname.local instead of IP to avoid issues when IP changes.
                       </p>
                     </div>
                     
-                    {/* Counter as Admin Toggle */}
                     <div className="pt-4 border-t border-border">
                       <div className="flex items-center justify-between">
                         <div>
                           <label className="text-sm font-medium">Counter as Admin Mode</label>
                           <p className="text-xs text-muted-foreground mt-1">
-                            When enabled, counter staff can access all admin features.<br/>
-                            Useful for single-person operations without separate admin.
+                            Counter staff can access all admin features.
                           </p>
                         </div>
                         <Switch
@@ -1546,31 +1541,131 @@ export default function Admin() {
                   </div>
                 </div>
 
-                {/* Point System Settings */}
+                {/* Restaurant Logo */}
+                <div className="bg-card rounded-xl border border-border p-5">
+                  <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                    <ImageIcon className="w-5 h-5 text-primary" />
+                    Restaurant Logo
+                  </h3>
+                  <div className="flex gap-4 items-center">
+                    {settings.logo ? (
+                      <img src={settings.logo} alt="Logo" className="w-20 h-20 rounded-xl object-cover border-2 border-border" />
+                    ) : (
+                      <div className="w-20 h-20 rounded-xl bg-muted flex items-center justify-center border-2 border-dashed border-border">
+                        <ImageIcon className="w-8 h-8 text-muted-foreground" />
+                      </div>
+                    )}
+                    <div className="flex-1 space-y-2">
+                      <Input 
+                        type="file" 
+                        accept="image/*" 
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (!file) return;
+                          
+                          // Compress and resize image
+                          const img = new Image();
+                          const canvas = document.createElement('canvas');
+                          const ctx = canvas.getContext('2d');
+                          
+                          img.onload = () => {
+                            // Max dimensions
+                            const maxSize = 200;
+                            let { width, height } = img;
+                            
+                            if (width > height) {
+                              if (width > maxSize) {
+                                height = (height * maxSize) / width;
+                                width = maxSize;
+                              }
+                            } else {
+                              if (height > maxSize) {
+                                width = (width * maxSize) / height;
+                                height = maxSize;
+                              }
+                            }
+                            
+                            canvas.width = width;
+                            canvas.height = height;
+                            ctx?.drawImage(img, 0, 0, width, height);
+                            
+                            // Compress to JPEG with 0.7 quality
+                            const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.7);
+                            updateSettings({ logo: compressedDataUrl });
+                            toast.success('Logo uploaded successfully');
+                          };
+                          
+                          img.onerror = () => {
+                            toast.error('Failed to load image');
+                          };
+                          
+                          const reader = new FileReader();
+                          reader.onload = (event) => {
+                            img.src = event.target?.result as string;
+                          };
+                          reader.readAsDataURL(file);
+                        }}
+                        className="text-sm"
+                      />
+                      <p className="text-xs text-muted-foreground">Auto-resized to 200px. Used on customer page.</p>
+                      {settings.logo && (
+                        <Button variant="ghost" size="sm" onClick={() => updateSettings({ logo: undefined })}>
+                          <Trash2 className="w-4 h-4 mr-1" /> Remove
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* WiFi Credentials */}
+                <div className="bg-card rounded-xl border border-border p-5">
+                  <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                    <QrCode className="w-5 h-5 text-primary" />
+                    WiFi Credentials
+                  </h3>
+                  <div className="space-y-4">
+                    <div>
+                      <label className="text-sm font-medium">WiFi SSID</label>
+                      <Input value={settings.wifiSSID || ''} onChange={e => updateSettings({ wifiSSID: e.target.value })} />
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium">WiFi Password</label>
+                      <Input value={settings.wifiPassword || ''} onChange={e => updateSettings({ wifiPassword: e.target.value })} />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Right Column */}
+              <div className="space-y-4">
+                {/* Kitchen Settings */}
+                <div className="bg-card rounded-xl border border-border p-5">
+                  <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                    <Settings className="w-5 h-5 text-warning" />
+                    Kitchen Settings
+                  </h3>
+                  <div>
+                    <label className="text-sm font-medium">Kitchen Handles (Parallel Orders)</label>
+                    <Input 
+                      type="number" 
+                      min="1"
+                      max="10"
+                      value={settings.kitchenHandles || 3} 
+                      onChange={e => updateSettings({ kitchenHandles: parseInt(e.target.value) || 3 })} 
+                      placeholder="3"
+                    />
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Number of orders the kitchen can prepare simultaneously.
+                    </p>
+                  </div>
+                </div>
+
+                {/* Loyalty Point System */}
                 <div className="bg-card rounded-xl border border-border p-5">
                   <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
                     <TrendingUp className="w-5 h-5 text-warning" />
                     Loyalty Point System
                   </h3>
-                  
-                  {/* Kitchen Settings */}
-                  <div className="mb-6 pb-4 border-b border-border">
-                    <h3 className="font-medium mb-3">Kitchen Settings</h3>
-                    <div>
-                      <label className="text-sm font-medium">Kitchen Handles (Parallel Orders)</label>
-                      <Input 
-                        type="number" 
-                        min="1"
-                        max="10"
-                        value={settings.kitchenHandles || 3} 
-                        onChange={e => updateSettings({ kitchenHandles: parseInt(e.target.value) || 3 })} 
-                        placeholder="3"
-                      />
-                      <p className="text-xs text-muted-foreground mt-1">
-                        Number of orders the kitchen can prepare simultaneously. Used for wait time estimation.
-                      </p>
-                    </div>
-                  </div>
                   
                   {/* Enable/Disable Toggle */}
                   <div className="flex items-center justify-between mb-4 pb-4 border-b border-border">
@@ -1655,85 +1750,11 @@ export default function Admin() {
                         </div>
                       </div>
                       
-                      {/* Preview calculation */}
-                      <div className="bg-muted/50 rounded-lg p-4 mt-4">
-                        <p className="text-sm font-medium mb-2">Example:</p>
-                        <p className="text-xs text-muted-foreground">
-                          • Customer spends रू500 → Earns {Math.round(500 * (settings.pointsPerRupee || 0.1))} points<br/>
-                          • Customer has 100 points → Can redeem for रू{Math.min(
-                            100 * (settings.pointValueInRupees || 1),
-                            settings.maxDiscountRupees || 100 * (settings.pointValueInRupees || 1)
-                          )} discount
-                          {settings.maxDiscountRupees ? ` (max रू${settings.maxDiscountRupees})` : ''}
-                        </p>
-                      </div>
                     </div>
                   )}
                 </div>
 
-                <div className="bg-card rounded-xl border border-border p-5">
-                  <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-                    <QrCode className="w-5 h-5 text-primary" />
-                    WiFi Credentials
-                  </h3>
-                  <div className="space-y-4">
-                    <div>
-                      <label className="text-sm font-medium">WiFi SSID</label>
-                      <Input value={settings.wifiSSID || ''} onChange={e => updateSettings({ wifiSSID: e.target.value })} />
-                    </div>
-                    <div>
-                      <label className="text-sm font-medium">WiFi Password</label>
-                      <Input value={settings.wifiPassword || ''} onChange={e => updateSettings({ wifiPassword: e.target.value })} />
-                    </div>
-                  </div>
-                </div>
-
-                {/* Logo Upload Section */}
-                <div className="bg-card rounded-xl border border-border p-5">
-                  <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-                    <ImageIcon className="w-5 h-5 text-primary" />
-                    Restaurant Logo
-                  </h3>
-                  <div className="flex gap-4 items-center">
-                    {settings.logo ? (
-                      <img src={settings.logo} alt="Logo" className="w-20 h-20 rounded-xl object-cover border-2 border-border" />
-                    ) : (
-                      <div className="w-20 h-20 rounded-xl bg-muted flex items-center justify-center border-2 border-dashed border-border">
-                        <ImageIcon className="w-8 h-8 text-muted-foreground" />
-                      </div>
-                    )}
-                    <div className="flex-1 space-y-2">
-                      <Input 
-                        type="file" 
-                        accept="image/*" 
-                        onChange={(e) => {
-                          const file = e.target.files?.[0];
-                          if (!file) return;
-                          if (file.size > 2 * 1024 * 1024) {
-                            toast.error('Image must be less than 2MB');
-                            return;
-                          }
-                          const reader = new FileReader();
-                          reader.onload = (event) => {
-                            updateSettings({ logo: event.target?.result as string });
-                          };
-                          reader.readAsDataURL(file);
-                        }}
-                        className="text-sm"
-                      />
-                      <p className="text-xs text-muted-foreground">Max 2MB, JPG/PNG. Used on customer page & printed receipts.</p>
-                      {settings.logo && (
-                        <Button variant="ghost" size="sm" onClick={() => updateSettings({ logo: undefined })}>
-                          <Trash2 className="w-4 h-4 mr-1" /> Remove Logo
-                        </Button>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Right Column - Social Media */}
-              <div className="space-y-4">
+                {/* Social Media Links */}
                 <div className="bg-card rounded-xl border border-border p-5">
                   <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
                     <TrendingUp className="w-5 h-5 text-primary" />
