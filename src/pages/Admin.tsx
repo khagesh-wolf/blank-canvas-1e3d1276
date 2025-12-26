@@ -1760,6 +1760,65 @@ export default function Admin() {
                   </div>
                 </div>
 
+                {/* Theme & Sound Settings */}
+                <div className="bg-card rounded-xl border border-border p-5">
+                  <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                    <Settings className="w-5 h-5 text-primary" />
+                    Theme & Sound
+                  </h3>
+                  <div className="space-y-4">
+                    {/* Dark Mode */}
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <label className="text-sm font-medium">Dark Mode</label>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          Enable dark theme for low-light environments.
+                        </p>
+                      </div>
+                      <Select 
+                        value={settings.theme || 'light'} 
+                        onValueChange={(value: 'light' | 'dark' | 'system') => {
+                          updateSettings({ theme: value });
+                          document.documentElement.classList.remove('light', 'dark');
+                          if (value === 'system') {
+                            const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                            document.documentElement.classList.add(isDark ? 'dark' : 'light');
+                          } else {
+                            document.documentElement.classList.add(value);
+                          }
+                          toast.success(`Theme set to ${value}`);
+                        }}
+                      >
+                        <SelectTrigger className="w-32">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="light">Light</SelectItem>
+                          <SelectItem value="dark">Dark</SelectItem>
+                          <SelectItem value="system">System</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    
+                    {/* Sound Alerts */}
+                    <div className="flex items-center justify-between pt-4 border-t border-border">
+                      <div>
+                        <label className="text-sm font-medium">Sound Alerts</label>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          Play sounds for new orders and waiter calls.
+                        </p>
+                      </div>
+                      <Switch
+                        checked={settings.soundAlertsEnabled !== false}
+                        onCheckedChange={(checked) => {
+                          updateSettings({ soundAlertsEnabled: checked });
+                          toast.success(checked ? 'Sound alerts enabled' : 'Sound alerts disabled');
+                        }}
+                      />
+                    </div>
+                  </div>
+                </div>
+
                 {/* Loyalty Point System */}
                 <div className="bg-card rounded-xl border border-border p-5">
                   <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
