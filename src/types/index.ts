@@ -104,6 +104,10 @@ export interface Settings {
   pointValueInRupees?: number;   // How much 1 point is worth in rupees (e.g., 1 point = 1 rupee)
   maxDiscountRupees?: number;    // Maximum discount in rupees that can be applied
   maxDiscountPoints?: number;    // Maximum points that can be used at once
+  // Theme
+  theme?: 'light' | 'dark' | 'system';
+  // Sound alerts
+  soundAlertsEnabled?: boolean;
 }
 
 export interface DashboardStats {

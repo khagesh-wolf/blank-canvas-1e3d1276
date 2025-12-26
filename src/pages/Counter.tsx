@@ -275,23 +275,41 @@ export default function Counter() {
   };
   const filteredExpenses = getFilteredExpenses();
 
-  // Table map data - compute occupied/vacant tables
+  // Table map data - compute table status with colors
   const tableMapData = useMemo(() => {
     const tableCount = settings.tableCount || 10;
-    const activeOrders = orders.filter(o => ['pending', 'accepted', 'preparing'].includes(o.status));
+    const activeOrders = orders.filter(o => ['pending', 'accepted', 'preparing', 'ready'].includes(o.status));
+    const pendingOrders = orders.filter(o => o.status === 'pending');
+    const readyOrders = orders.filter(o => o.status === 'ready');
     
     return Array.from({ length: tableCount }, (_, i) => {
       const tableNum = i + 1;
       const tableOrders = activeOrders.filter(o => o.tableNumber === tableNum);
+      const hasPending = pendingOrders.some(o => o.tableNumber === tableNum);
+      const hasReady = readyOrders.some(o => o.tableNumber === tableNum);
       const totalAmount = tableOrders.reduce((sum, o) => 
         sum + o.items.reduce((s, item) => s + item.price * item.qty, 0), 0
       );
       
+      // Determine status: empty < ordering (pending) < occupied (in progress) < waiting (ready)
+      let status: 'empty' | 'ordering' | 'occupied' | 'waiting' = 'empty';
+      if (tableOrders.length > 0) {
+        if (hasReady) {
+          status = 'waiting'; // Ready to serve
+        } else if (hasPending) {
+          status = 'ordering'; // Has pending orders
+        } else {
+          status = 'occupied'; // Being prepared
+        }
+      }
+      
       return {
         tableNumber: tableNum,
-        isOccupied: tableOrders.length > 0,
+        status,
         customerCount: new Set(tableOrders.map(o => o.customerPhone)).size || undefined,
         totalAmount: totalAmount || undefined,
+        hasActiveOrders: tableOrders.length > 0,
+        hasPendingOrders: hasPending,
       };
     });
   }, [orders, settings.tableCount]);
@@ -1414,9 +1432,11 @@ export default function Counter() {
               toast.info(`Filtered to Table ${tableNum}`);
             }}
           />
-          <div className="flex justify-between text-sm text-muted-foreground px-4">
-            <span>🟢 Occupied: {tableMapData.filter(t => t.isOccupied).length}</span>
-            <span>⚪ Vacant: {tableMapData.filter(t => !t.isOccupied).length}</span>
+          <div className="flex flex-wrap justify-center gap-4 text-sm text-muted-foreground px-4">
+            <span>🔴 Occupied: {tableMapData.filter(t => t.status === 'occupied').length}</span>
+            <span>🟡 Ordering: {tableMapData.filter(t => t.status === 'ordering').length}</span>
+            <span>🟢 Ready: {tableMapData.filter(t => t.status === 'waiting').length}</span>
+            <span>⚪ Empty: {tableMapData.filter(t => t.status === 'empty').length}</span>
           </div>
         </DialogContent>
       </Dialog>
