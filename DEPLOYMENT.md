@@ -11,7 +11,7 @@ ALTER TABLE settings ADD COLUMN IF NOT EXISTS accepted_order_cancel_admin_only B
 
 ## Architecture Overview
                                     
-                                    ```
+                                    
                                     ┌─────────────────────────────────────────────────────────────┐
                                     │                    Your Customers                           │
                                     └─────────────────────────┬───────────────────────────────────┘
@@ -30,7 +30,7 @@ ALTER TABLE settings ADD COLUMN IF NOT EXISTS accepted_order_cancel_admin_only B
                                     │   ✓ WebP optimization │     │   ✓ Realtime subscriptions    │
                                     │   ✓ Global caching    │     │   ✓ Unlimited API calls       │
                                     └───────────────────────┘     └───────────────────────────────┘
-                                    ```
+                                    
 
 ## Free Tier Limits
 
