@@ -32,6 +32,22 @@ class OfflineStorage {
 
       request.onsuccess = () => {
         this.db = request.result;
+
+        // If the browser closes the connection (navigation/reload/version change),
+        // reset state so future calls can re-init cleanly.
+        this.db.onclose = () => {
+          this.db = null;
+          this.initPromise = null;
+        };
+        this.db.onversionchange = () => {
+          try {
+            this.db?.close();
+          } finally {
+            this.db = null;
+            this.initPromise = null;
+          }
+        };
+
         resolve();
       };
 
@@ -72,8 +88,22 @@ class OfflineStorage {
   private async getStore(storeName: string, mode: IDBTransactionMode = 'readonly'): Promise<IDBObjectStore> {
     await this.init();
     if (!this.db) throw new Error('Database not initialized');
-    const tx = this.db.transaction(storeName, mode);
-    return tx.objectStore(storeName);
+
+    try {
+      const tx = this.db.transaction(storeName, mode);
+      return tx.objectStore(storeName);
+    } catch (err) {
+      // Typical when the DB is closing during navigation or a versionchange.
+      if (err instanceof DOMException && err.name === 'InvalidStateError') {
+        this.db = null;
+        this.initPromise = null;
+        await this.init();
+        if (!this.db) throw new Error('Database not initialized');
+        const tx = this.db.transaction(storeName, mode);
+        return tx.objectStore(storeName);
+      }
+      throw err;
+    }
   }
 
   // Menu Items
