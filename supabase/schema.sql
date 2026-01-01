@@ -582,7 +582,7 @@ BEGIN
       WHERE id = inv_id;
       
       INSERT INTO inventory_transactions (id, inventory_item_id, transaction_type, quantity, unit, order_id)
-      VALUES (gen_random_uuid()::text, inv_id, 'sale', -item.quantity, item.unit::inventory_unit_type, p_order_id);
+      VALUES (uuid_generate_v4()::text, inv_id, 'sale', -item.quantity, item.unit::inventory_unit_type, p_order_id);
     END IF;
   END LOOP;
   
@@ -746,6 +746,71 @@ BEGIN
   ORDER BY po.sort_order;
 END;
 $$ LANGUAGE plpgsql STABLE;
+
+-- ===========================================
+-- API ACCESS (Grants) + REALTIME SETUP
+-- ===========================================
+
+-- Grants for REST/RPC access via anon key (RLS is NOT enabled by this schema)
+GRANT USAGE ON SCHEMA public TO anon, authenticated;
+GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO anon, authenticated;
+GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO anon, authenticated;
+
+-- Explicit RPC grants (keeps working even if default privileges change)
+GRANT EXECUTE ON FUNCTION get_low_stock_items() TO anon, authenticated;
+GRANT EXECUTE ON FUNCTION get_daily_stats(DATE) TO anon, authenticated;
+GRANT EXECUTE ON FUNCTION get_active_orders_summary() TO anon, authenticated;
+GRANT EXECUTE ON FUNCTION deduct_inventory_batch(JSONB, TEXT) TO anon, authenticated;
+GRANT EXECUTE ON FUNCTION get_item_portion_prices(TEXT) TO anon, authenticated;
+GRANT EXECUTE ON FUNCTION check_payment_block(SMALLINT, VARCHAR) TO anon, authenticated;
+GRANT EXECUTE ON FUNCTION record_payment_block(SMALLINT, VARCHAR) TO anon, authenticated;
+GRANT EXECUTE ON FUNCTION override_payment_block(INTEGER) TO anon, authenticated;
+GRANT EXECUTE ON FUNCTION archive_old_orders(INTEGER) TO anon, authenticated;
+GRANT EXECUTE ON FUNCTION get_customer_analytics(VARCHAR) TO anon, authenticated;
+
+-- Realtime (required for multi-device syncing)
+-- Make UPDATE payloads complete for the critical tables.
+ALTER TABLE IF EXISTS orders REPLICA IDENTITY FULL;
+ALTER TABLE IF EXISTS bills REPLICA IDENTITY FULL;
+ALTER TABLE IF EXISTS inventory_items REPLICA IDENTITY FULL;
+ALTER TABLE IF EXISTS inventory_transactions REPLICA IDENTITY FULL;
+ALTER TABLE IF EXISTS waiter_calls REPLICA IDENTITY FULL;
+ALTER TABLE IF EXISTS menu_items REPLICA IDENTITY FULL;
+ALTER TABLE IF EXISTS categories REPLICA IDENTITY FULL;
+ALTER TABLE IF EXISTS settings REPLICA IDENTITY FULL;
+ALTER TABLE IF EXISTS expenses REPLICA IDENTITY FULL;
+ALTER TABLE IF EXISTS staff REPLICA IDENTITY FULL;
+ALTER TABLE IF EXISTS customers REPLICA IDENTITY FULL;
+ALTER TABLE IF EXISTS transactions REPLICA IDENTITY FULL;
+ALTER TABLE IF EXISTS portion_options REPLICA IDENTITY FULL;
+ALTER TABLE IF EXISTS item_portion_prices REPLICA IDENTITY FULL;
+
+-- Add tables to the realtime publication (idempotent)
+DO $$
+BEGIN
+  PERFORM 1;
+  ALTER PUBLICATION supabase_realtime ADD TABLE orders;
+  ALTER PUBLICATION supabase_realtime ADD TABLE bills;
+  ALTER PUBLICATION supabase_realtime ADD TABLE inventory_items;
+  ALTER PUBLICATION supabase_realtime ADD TABLE inventory_transactions;
+  ALTER PUBLICATION supabase_realtime ADD TABLE waiter_calls;
+  ALTER PUBLICATION supabase_realtime ADD TABLE menu_items;
+  ALTER PUBLICATION supabase_realtime ADD TABLE categories;
+  ALTER PUBLICATION supabase_realtime ADD TABLE settings;
+  ALTER PUBLICATION supabase_realtime ADD TABLE expenses;
+  ALTER PUBLICATION supabase_realtime ADD TABLE staff;
+  ALTER PUBLICATION supabase_realtime ADD TABLE customers;
+  ALTER PUBLICATION supabase_realtime ADD TABLE transactions;
+  ALTER PUBLICATION supabase_realtime ADD TABLE portion_options;
+  ALTER PUBLICATION supabase_realtime ADD TABLE item_portion_prices;
+EXCEPTION
+  WHEN duplicate_object THEN
+    -- Table already in publication
+    NULL;
+  WHEN undefined_object THEN
+    -- Publication doesn't exist on some setups; ignore.
+    NULL;
+END $$;
 
 -- ===========================================
 -- DEFAULT DATA

@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { useStore } from '@/store/useStore';
 import { AlertTriangle } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
@@ -10,7 +11,9 @@ export function LowStockAlert({ compact = false }: LowStockAlertProps) {
   const { lowStockItems, refreshLowStockItems } = useStore();
 
   // Refresh low stock items on mount
-  useStore.getState().refreshLowStockItems();
+  useEffect(() => {
+    refreshLowStockItems();
+  }, [refreshLowStockItems]);
 
   if (lowStockItems.length === 0) return null;
 

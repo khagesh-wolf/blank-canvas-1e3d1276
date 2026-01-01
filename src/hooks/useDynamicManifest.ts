@@ -251,6 +251,7 @@ export const useDynamicManifest = () => {
 
     const shortName = `${restaurantName.slice(0, 8)} ${roleLabel}`;
 
+    const origin = window.location.origin;
     const manifest = {
       name: appName,
       short_name: shortName,
@@ -259,8 +260,10 @@ export const useDynamicManifest = () => {
       background_color: roleConfig.background_color,
       display: 'standalone',
       orientation: 'portrait',
-      start_url: roleConfig.start_url,
-      scope: '/',
+      // When using a blob: manifest URL, relative URLs can be treated as invalid.
+      // Use absolute URLs so browsers accept start_url/scope.
+      start_url: new URL(roleConfig.start_url, origin).toString(),
+      scope: new URL('/', origin).toString(),
       icons: [
         {
           src: iconUrls.icon192,
