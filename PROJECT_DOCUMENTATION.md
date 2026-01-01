@@ -1,583 +1,549 @@
-# Sajilo Orders POS
+# Sajilo Orders POS - Complete Restaurant Management System
 
-## Transform Your Restaurant with Digital Ordering
+> **Zero Investment. Maximum Efficiency. Instant Results.**
 
-**The Smart, Cost-Free Solution for Modern Restaurants**
-
----
-
-## 🎯 What is Sajilo Orders?
-
-Sajilo Orders is a **complete restaurant management system** that replaces paper menus, manual order taking, and expensive POS hardware with a simple, elegant digital solution.
-
-**One QR code. Instant orders. Happy customers.**
+Sajilo Orders is a comprehensive, cloud-based Point of Sale (POS) and restaurant management system designed specifically for cafes, restaurants, bars, and food establishments in Nepal. It replaces traditional paper-based ordering with a modern, digital solution that costs nothing to implement.
 
 ---
 
-## ✨ Why Choose Sajilo Orders?
+## 🎯 Why Sajilo Orders?
 
-### 💰 Zero Investment Required
+### The Problem with Traditional Systems
+- Paper wastage and manual errors
+- Delayed order communication between floor and kitchen
+- No customer data or loyalty tracking
+- Expensive POS hardware and software licenses
+- No real-time visibility into business performance
 
-| Traditional POS | Sajilo Orders |
-|-----------------|---------------|
-| Rs. 50,000+ hardware | Rs. 0 |
-| Rs. 5,000/month fees | Rs. 0 |
-| Expensive repairs | No hardware to break |
-| Staff training costs | Intuitive interface |
-
-**Total Savings: Rs. 1,00,000+ in first year**
-
-### ⚡ Instant ROI
-
-- Works on devices you already have (phones, tablets)
-- No installation or setup fees
-- Start using within 24 hours
-- Scale from 5 to 500 tables without extra cost
+### The Sajilo Solution
+| Traditional | Sajilo Orders |
+|-------------|---------------|
+| Paper bills, manual writing | Digital QR ordering |
+| Shouting orders to kitchen | Real-time Kitchen Display |
+| No customer memory | Automatic loyalty program |
+| Rs. 50,000+ POS systems | Completely FREE |
+| Manual sales calculation | Automatic analytics & reports |
 
 ---
 
-## 🌟 Features That Make a Difference
-
-### For Your Customers
-
-| Feature | Benefit |
-|---------|---------|
-| 📱 **QR Code Ordering** | Customers order from their phone - no waiting for waiter |
-| ❤️ **Favorites** | Remember their preferred items across visits |
-| ⏱️ **Live Wait Time** | Know exactly when food will be ready |
-| 🔔 **Call Waiter** | One tap to request service |
-| 🎯 **Loyalty Points** | Earn rewards, redeem discounts |
-| 🌐 **Works Offline** | Menu loads even with slow internet |
-
-### For Your Staff
-
-| Feature | Benefit |
-|---------|---------|
-| 🖥️ **Counter Dashboard** | See all tables, orders, and bills at a glance |
-| 👨‍🍳 **Kitchen Display (KDS)** | Orders appear instantly - no missed tickets |
-| 🗺️ **Visual Table Map** | Color-coded status for every table |
-| 🔊 **Sound Alerts** | Never miss a new order |
-| 🧾 **Receipt Printing** | Direct thermal printer support |
-| 💵 **Cash Register** | Track cash, expenses, daily totals |
-| 🛎️ **Waiter App** | Mobile-first order taking with slide-up cart panel |
-| 📲 **PIN Quick Login** | Waiters login with just a 4-digit PIN |
-| 🔔 **Ready Order Alerts** | Sound notification when orders are ready to serve |
-
-### For You (Owner/Manager)
-
-| Feature | Benefit |
-|---------|---------|
-| 📊 **Real-time Analytics** | Revenue, popular items, peak hours |
-| 👥 **Customer Database** | Track visits, spending, preferences |
-| 📱 **Mobile Access** | Manage from anywhere |
-| 🌙 **Dark Mode** | Staff-friendly for evening shifts |
-| 🔐 **Role-Based Access** | Admin, Counter, Waiter, Kitchen roles |
-| 📥 **Export Data** | Download transactions, customer lists |
-| 📣 **Social Media Links** | Instagram, Facebook, TikTok, Google Review integration |
-| 🎛️ **Kitchen Display System (KDS)** | Toggle between Counter-only or shared order acceptance |
-
----
-
-## 📈 Real Impact on Your Business
-
-### Time Saved Per Day
-
-```
-┌────────────────────────────────────────────────────────┐
-│  Traditional                    Sajilo Orders          │
-│                                                        │
-│  Order Taking:    3-5 min  →   30 seconds   (90% ↓)   │
-│  Kitchen Comm:    Walk back →  Instant      (100% ↓)  │
-│  Bill Calculate:  2-3 min  →   1 click      (100% ↓)  │
-│  Daily Reports:   1 hour   →   Already done (100% ↓)  │
-│                                                        │
-│  Total Time Saved: 4-6 hours per day                  │
-└────────────────────────────────────────────────────────┘
-```
-
-### Error Reduction
-
-| Problem | Before | After |
-|---------|--------|-------|
-| Missed orders | Common | Zero |
-| Wrong items | Frequent | Rare |
-| Bill mistakes | Often | Never |
-| Lost orders | Sometimes | Impossible |
-
-### Customer Satisfaction
-
-- 📉 **40% faster** table turnover
-- 📈 **25% increase** in order size (easier to browse full menu)
-- ⭐ **Higher ratings** (no waiting frustration)
-- 🔄 **More repeat visits** (loyalty points motivation)
-
----
-
-## 🔄 How It Works
-
-### Customer Journey
+## 🏗️ System Architecture
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
+│                        SAJILO ORDERS                            │
+├─────────────────────────────────────────────────────────────────┤
 │                                                                 │
-│   1. SCAN                2. ORDER                3. ENJOY      │
-│   ───────                ─────────               ───────        │
+│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐             │
+│  │   CUSTOMER  │  │   COUNTER   │  │   KITCHEN   │             │
+│  │   (Mobile)  │  │   (Tablet)  │  │    (TV)     │             │
+│  └──────┬──────┘  └──────┬──────┘  └──────┬──────┘             │
+│         │                │                │                     │
+│         └────────────────┼────────────────┘                     │
+│                          │                                      │
+│                   ┌──────▼──────┐                               │
+│                   │  SUPABASE   │                               │
+│                   │  REALTIME   │                               │
+│                   │  DATABASE   │                               │
+│                   └─────────────┘                               │
 │                                                                 │
-│   ┌─────────┐           ┌─────────┐           ┌─────────┐      │
-│   │ [QR]    │    →      │  Menu   │    →      │  Food   │      │
-│   │ Table 5 │           │  Cart   │           │ Arrives │      │
-│   └─────────┘           │ Order   │           └─────────┘      │
-│                         └─────────┘                             │
-│                                                                 │
-│   Customer scans        Browse menu,           Kitchen prepares,│
-│   QR at table           add items,             staff serves     │
-│                         place order                              │
-│                                                                 │
-└─────────────────────────────────────────────────────────────────┘
-```
-
-### Kitchen Flow
-
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                                                                 │
-│   ORDER PLACED          KITCHEN SEES           CUSTOMER SERVED  │
-│   ─────────────         ────────────           ────────────────│
-│                                                                 │
-│   Customer taps   →     Instant alert    →     Mark complete   │
-│   "Place Order"         on Kitchen              when ready      │
-│                         Display                                  │
-│                                                                 │
-│   • No paper tickets                                            │
-│   • No miscommunication                                         │
-│   • Real-time status updates                                    │
+│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐             │
+│  │   WAITER    │  │    ADMIN    │  │   REPORTS   │             │
+│  │   (Phone)   │  │  (Desktop)  │  │    (PDF)    │             │
+│  └─────────────┘  └─────────────┘  └─────────────┘             │
 │                                                                 │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## 🖥️ Visual Tour
+## 👤 User Roles & Features
 
-### Counter View - Your Command Center
+### 1. Customer Interface (Mobile Web App)
 
+Customers scan a QR code at their table and get instant access to the digital menu.
+
+#### Features:
+- **QR Code Ordering**: Scan table QR → Browse menu → Place order
+- **Beautiful Menu Display**: High-quality images, descriptions, and prices
+- **Category Navigation**: Easy browsing with category tabs and search
+- **Subcategory Support**: Hierarchical menu organization (e.g., Drinks → Beers, Cocktails)
+- **Portion Selection**: Choose drink sizes (30ml, 60ml, 90ml, etc.) with dynamic pricing
+- **Favorites System**: Heart items for quick reordering on future visits
+- **Real-time Order Status**: See when order is accepted, preparing, or ready
+- **Order History**: View current session orders and totals
+- **Call Waiter Button**: Request assistance with one tap
+- **Special Instructions**: Add notes for dietary requirements or preferences
+- **Loyalty Points Display**: See accumulated points and tier status
+- **Dark/Light Mode**: Comfortable viewing in any environment
+- **PWA Installation**: Install as app on phone for faster access
+- **Rush Hour Indicator**: Know when kitchen is busy (estimated wait time)
+- **Stock Awareness**: Out-of-stock items automatically hidden/disabled
+- **Popular Items Badge**: See what other customers love
+- **Social Media Links**: Quick access to restaurant's Instagram, Facebook, TikTok
+- **Google Review Prompt**: Easy link to leave reviews
+
+#### Customer Flow:
 ```
-┌──────────────────────────────────────────────────────────────────┐
-│  SAJILO ORDERS                               Today's Revenue     │
-│  ───────────────                             Rs. 45,680          │
-│                                                                  │
-│  ┌─────────────────────┐  ┌─────────────────────────────────┐   │
-│  │    TABLE MAP        │  │     PENDING ORDERS              │   │
-│  │                     │  │                                 │   │
-│  │  🟢1  🔴2  🟡3  🟢4  │  │  Table 2 - 2 items - Rs. 450  │   │
-│  │                     │  │  ⏱️ 3 min ago                   │   │
-│  │  🟣5  🟢6  🔴7  🟢8  │  │  [Accept] [Reject]             │   │
-│  │                     │  │                                 │   │
-│  │  🟢9  🟢10          │  │  Table 3 - 1 item - Rs. 180    │   │
-│  │                     │  │  ⏱️ Just now                    │   │
-│  └─────────────────────┘  │  [Accept] [Reject]             │   │
-│                           └─────────────────────────────────┘   │
-│  🟢 Empty  🟡 Ordering  🔴 Occupied  🟣 Ready to Serve          │
-│                                                                  │
-└──────────────────────────────────────────────────────────────────┘
-```
-
-### Kitchen Display - Focused & Clear
-
-```
-┌──────────────────────────────────────────────────────────────────┐
-│  KITCHEN DISPLAY                              🔔 New Order!      │
-│  ───────────────                                                 │
-│                                                                  │
-│  ┌────────────────────┐  ┌────────────────────┐                 │
-│  │  TABLE 2           │  │  TABLE 7           │                 │
-│  │  ─────────         │  │  ─────────         │                 │
-│  │                    │  │                    │                 │
-│  │  2x Masala Tea     │  │  1x Cappuccino     │                 │
-│  │  1x Momo (Steam)   │  │  2x Samosa         │                 │
-│  │  1x Sandwich       │  │                    │                 │
-│  │                    │  │  ⏱️ 5 min          │                 │
-│  │  ⏱️ 8 min          │  │                    │                 │
-│  │                    │  │  [READY]           │                 │
-│  │  [READY]           │  │                    │                 │
-│  └────────────────────┘  └────────────────────┘                 │
-│                                                                  │
-└──────────────────────────────────────────────────────────────────┘
-```
-
-### Admin Dashboard - Full Control
-
-```
-┌──────────────────────────────────────────────────────────────────┐
-│  ADMIN DASHBOARD                                                 │
-│  ─────────────────────────────────────────────────────────────  │
-│                                                                  │
-│  [Dashboard] [Menu] [Staff] [Customers] [Transactions] [Settings]│
-│                                                                  │
-│  ┌──────────────────────────────────────────────────────────┐   │
-│  │  TODAY'S PERFORMANCE                                      │   │
-│  │                                                           │   │
-│  │  Revenue        Orders        Customers      Avg Order    │   │
-│  │  Rs. 45,680     67            45             Rs. 682      │   │
-│  │  ↑ 12%          ↑ 8%          ↑ 5%           ↑ 15%        │   │
-│  │                                                           │   │
-│  └──────────────────────────────────────────────────────────┘   │
-│                                                                  │
-│  ┌──────────────────────┐  ┌─────────────────────────────────┐  │
-│  │  TOP SELLING ITEMS   │  │  REVENUE TREND (7 Days)         │  │
-│  │                      │  │                                  │  │
-│  │  1. Masala Tea (156) │  │    ▂▄▆▇█▆▇                       │  │
-│  │  2. Momo (89)        │  │                                  │  │
-│  │  3. Cappuccino (67)  │  │  Mon Tue Wed Thu Fri Sat Sun     │  │
-│  └──────────────────────┘  └─────────────────────────────────┘  │
-│                                                                  │
-└──────────────────────────────────────────────────────────────────┘
+Scan QR → Enter Phone → Browse Menu → Add to Cart → Place Order → Track Status → Enjoy!
 ```
 
 ---
 
-## 🏆 Loyalty Program
+### 2. Counter Staff Interface (Tablet/Desktop)
 
-### How It Works
+The command center for daily operations.
 
+#### Features:
+- **Order Queue Management**: Accept/reject incoming orders with one click
+- **Grouped Order Display**: Multiple orders from same customer grouped together
+- **Order Age Timer**: Color-coded timers showing how long orders have been waiting
+- **Kitchen Order Ticket (KOT) Printing**: Auto-print tickets for kitchen
+- **Dual Printer Support**: Separate printers for kitchen and bar items
+- **Bill Generation**: Create bills with automatic calculations
+- **Multiple Payment Methods**: Cash, Fonepay QR, or Split Payment
+- **Discount Application**: Percentage or fixed amount discounts
+- **Loyalty Point Redemption**: Apply customer points as discounts
+- **Transaction History**: Searchable history with date filters
+- **Expense Tracking**: Log daily expenses by category (ingredients, utilities, salary, etc.)
+- **Table Map View**: Visual overview of all tables and their status
+- **Cash Register**: Track opening balance, cash in/out, expected closing
+- **Waiter Call Notifications**: Audio + visual alerts for customer requests
+- **Low Stock Alerts**: Get notified when inventory is running low
+- **Backup Reminder**: Prompted to backup data regularly
+- **Printer Management**: Connect and manage receipt/KOT printers
+- **Quick Search**: Find orders by table, phone, or order ID
+- **Kitchen Access**: Optional access to Kitchen Display page
+- **Theme Toggle**: Switch between light and dark modes
+
+#### Counter Flow:
 ```
-┌─────────────────────────────────────────────────────────────┐
-│                                                             │
-│  SPEND Rs. 100  →  EARN 10 POINTS  →  REDEEM Rs. 10 OFF    │
-│                                                             │
-│  ┌─────────────────────────────────────────────────────┐   │
-│  │  Customer Profile                                    │   │
-│  │  ──────────────────                                  │   │
-│  │                                                      │   │
-│  │  📱 9841234567                                       │   │
-│  │  🏆 Points: 350                                      │   │
-│  │  💰 Total Spent: Rs. 12,450                          │   │
-│  │  📊 Visits: 28                                       │   │
-│  │                                                      │   │
-│  │  [Apply 100 Points = Rs. 100 discount]               │   │
-│  │                                                      │   │
-│  └─────────────────────────────────────────────────────┘   │
-│                                                             │
-└─────────────────────────────────────────────────────────────┘
+New Order Alert → Review Items → Accept/Reject → Monitor Progress → Generate Bill → Process Payment
 ```
-
-### Configurable Settings
-
-- Points earned per rupee spent
-- Point value in rupees
-- Maximum discount limit
-- Works automatically - no manual tracking
 
 ---
 
-## 🔒 Smart Security Features
+### 3. Kitchen Display System (TV/Monitor)
+
+Wall-mounted display for kitchen staff to manage orders efficiently.
+
+#### Features:
+- **Real-time Order Display**: Orders appear instantly when accepted
+- **Order Age Timer**: Color-coded timers (green → yellow → red)
+- **Status Workflow**: New → Cooking → Ready with one-click progression
+- **Priority Marking**: Rush orders highlighted prominently
+- **Multiple View Modes**:
+  - **Orders View**: Traditional order cards with all items
+  - **Items View**: Aggregated item list across all orders
+  - **Lanes View**: Category-based preparation lanes
+- **Sound Notifications**: Audio alert for new orders (toggleable)
+- **Fullscreen Mode**: Larger fonts optimized for wall-mounted displays
+- **Order Details**: Table number, items, quantities, special notes
+- **KOT Printing**: Manual reprint option for kitchen tickets
+- **Low Stock Visibility**: See which items are running low
+- **Item-Level Tracking**: Mark individual items as ready
+- **KDS Mode**: Accept orders directly from kitchen (configurable)
+
+#### Kitchen Flow:
+```
+Order Arrives → Start Preparing → Mark Items Ready → Complete Order → Bell for Pickup
+```
+
+---
+
+### 4. Waiter Interface (Mobile Phone)
+
+Designed for table service staff on the move.
+
+#### Features:
+- **PIN Login**: Quick 4-6 digit PIN entry (no typing usernames)
+- **Table Selection**: Visual grid of all tables
+- **Mobile Menu Access**: Full menu with images and portions
+- **Order Taking**: Build orders while at the table
+- **Stock Checking**: See available quantities before ordering
+- **Cart Management**: Adjust quantities, add notes
+- **Slide-Up Cart Panel**: Mobile-optimized cart interface
+- **Order Submission**: Send directly to kitchen or counter
+- **Active Orders View**: See all orders in progress
+- **Ready Order Alerts**: Audio + visual notification when order is ready
+- **Serve Confirmation**: Mark orders as served
+- **Order Cancellation**: Cancel orders (with permission settings)
+- **Dark/Light Mode**: Comfortable for various lighting conditions
+- **Refresh Button**: Quick sync with server
+
+#### Waiter Flow:
+```
+Login with PIN → Select Table → Take Order → Submit → Get Ready Alert → Serve → Repeat
+```
+
+---
+
+### 5. Admin Dashboard (Desktop/Tablet)
+
+Complete control over your restaurant operations.
+
+#### Dashboard Features
+- **Today's Stats**: Revenue, orders, active orders, active tables
+- **Revenue Charts**: Daily trends with date range filters
+- **Top Selling Items**: Visual breakdown of best performers
+- **Quick Actions**: Access all management areas
+- **Subscription Status**: View current plan status
+
+#### Menu Management
+- **Category Management**: Create, edit, reorder categories with drag-and-drop
+- **Subcategory Support**: Organize items hierarchically
+- **Bar/Kitchen Assignment**: Mark categories for specific printers
+- **Prep Time Setting**: Set estimated preparation time per category
+- **Menu Items**: Add/edit items with images, descriptions, prices
+- **Image Upload**: CDN-hosted images via Cloudflare R2
+- **Bulk Actions**: Enable/disable multiple items at once
+- **Availability Toggle**: Mark items out of stock instantly
+- **Search & Filter**: Find items quickly
+
+#### Inventory Management
+- **Stock Tracking**: Real-time inventory levels per item
+- **Unit Types**: ml, pcs, grams, bottle, pack, kg, liter
+- **Container Size**: Track bottles/packs with their sizes
+- **Portion Configuration**: Set up drink portions (30ml, 60ml, etc.)
+- **Portion Pricing**: Different prices per portion per item
+- **Stock Receive**: Log incoming inventory
+- **Stock Adjustment**: Manual corrections with notes
+- **Waste Tracking**: Log wasted/spoiled items
+- **Low Stock Alerts**: Configurable thresholds
+- **Auto-Deduction**: Stock reduces when orders are accepted
+- **Transaction History**: Full audit trail of all stock movements
+
+#### Customer Management
+- **Customer Database**: All customers with order history
+- **Loyalty Tiers**: Bronze → Silver → Gold → Platinum (auto-calculated)
+- **Points System**: Configurable earning and redemption rates
+- **Customer Analytics**: Spending patterns, favorite items, visit frequency
+- **Phone Number Update**: Change customer phone with auto-migration
+- **Search & Filter**: Find customers by phone or name
+
+#### Staff Management
+- **Role-Based Access**: Admin, Counter, Kitchen, Waiter roles
+- **Username/Password**: Secure login credentials
+- **PIN Setup**: Quick PIN for waiter app access
+- **Staff List**: View and manage all team members
+- **Active/Inactive Status**: Disable accounts without deleting
+
+#### Settings
+- **Restaurant Details**: Name, sub-name, logo
+- **WiFi Information**: Auto-included in QR codes
+- **Table Configuration**: Set number of tables
+- **Social Media Links**: Instagram, Facebook, TikTok, Google Reviews
+- **Theme Settings**: System, Light, or Dark mode
+- **Sound Alerts**: Enable/disable notification sounds
+- **Counter Mode**: Enable counter-as-admin for small teams
+- **Kitchen Access**: Allow counter staff to view Kitchen page
+- **KDS Settings**: Kitchen Display System on/off
+- **KOT Printing**: Kitchen Order Ticket settings
+- **Dual Printer**: Separate kitchen and bar printers
+- **Order Cancellation**: Restrict who can cancel accepted orders
+- **Point System**: Enable/configure loyalty program
+
+#### Reporting & Analytics
+- **Sales Analytics**: Revenue, orders, average order value
+- **Payment Breakdown**: Cash vs Fonepay payments
+- **Peak Hours Analysis**: When is your busiest time
+- **Category Performance**: Which categories sell best
+- **Item Performance**: Top sellers and underperformers
+- **Expense Analysis**: Spending by category
+- **Date Range Filters**: Analyze any time period
+
+#### Accounting Dashboard
+- **Daily Cash Management**: Opening balance, transactions, closing
+- **Expense Logging**: Record expenses by category
+- **Cash vs Digital Split**: Track payment methods
+- **Daily/Weekly/Monthly Views**: Flexible reporting periods
+- **Profit Calculation**: Revenue minus expenses
+- **Cash Drawer Sessions**: Track who opened/closed register
+
+#### Monthly Reports (PDF Download)
+- Financial Summary (revenue, expenses, profit)
+- Payment Method Breakdown
+- Expense Analysis by Category
+- Sales by Menu Category
+- Top Selling Items
+- Daily Summary Table
+- Detailed Expense Log
+- Cash Drawer Sessions
+
+#### Backup & Restore
+- **One-Click Backup**: Download complete JSON backup
+- **Backup Reminder**: Automatic reminders for regular backups
+- **Restore Capability**: Upload backup to restore data
+- **Backup Statistics**: See what's included in backup
+
+---
+
+## 🔒 Security Features
 
 ### Payment Block System
-
-Prevents misuse of old QR codes:
-
-```
-Customer pays bill → 3-hour cooldown starts → 
-Can't order from same table until:
-  • 3 hours pass, OR
-  • Staff approves new session with PIN
-```
+After a customer pays their bill, a 3-hour block prevents accidental reordering from the same table. Staff can override with PIN confirmation.
 
 ### Session Management
+- 4-hour table session timeout
+- Automatic logout after inactivity
+- Session tokens to prevent bill manipulation
+- Closed session tracking
 
-- 4-hour auto-logout for idle sessions
-- Phone number verification
-- Staff PIN for sensitive actions
-- Role-based access control
+### Access Control
+- Role-based permissions
+- PIN authentication for quick actions
+- Password protection for admin functions
+- Configurable order cancellation restrictions
 
-### Kitchen Display System (KDS)
+### Rate Limiting
+- Order placement rate limits (5 per 10 minutes)
+- Login attempt rate limiting
+- Protection against abuse
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                                                             │
-│  KDS Mode (Configurable in Admin Settings)                  │
-│                                                             │
-│  When KDS is OFF:                                           │
-│  • Only Counter can accept orders                           │
-│  • Kitchen sees accepted orders only                        │
-│                                                             │
-│  When KDS is ON:                                            │
-│  • Both Counter AND Kitchen can accept orders               │
-│  • Kitchen has full order control                           │
-│  • Faster workflow for busy restaurants                     │
-│                                                             │
-└─────────────────────────────────────────────────────────────┘
-```
+### Data Protection
+- Encrypted connections (HTTPS)
+- No sensitive data stored on client devices
+- Cloud backup with Supabase
 
 ---
 
-## 📱 Works Everywhere
+## 📱 PWA (Progressive Web App) Features
 
-### Progressive Web App (PWA)
+Sajilo Orders works as a native app without app store downloads.
 
-```
-┌────────────────────────────────────────────────────────────┐
-│                                                            │
-│  📱 INSTALL ON ANY DEVICE                                  │
-│                                                            │
-│  • No app store needed                                     │
-│  • Instant updates                                         │
-│  • Works offline (menu browsing)                           │
-│  • Home screen icon                                        │
-│  • Fast loading                                            │
-│  • Role-specific installs (Waiter, Counter, Kitchen)       │
-│                                                            │
-│  Supported:                                                │
-│  ✓ Android phones/tablets                                  │
-│  ✓ iPhone/iPad                                             │
-│  ✓ Windows/Mac computers                                   │
-│  ✓ Any modern browser                                      │
-│                                                            │
-│  Install Routes:                                           │
-│  • /install/waiter  - Waiter mobile app                    │
-│  • /install/counter - Counter dashboard                    │
-│  • /install/kitchen - Kitchen display                      │
-│  • /install/admin   - Admin panel                          │
-│                                                            │
-└────────────────────────────────────────────────────────────┘
-```
+### Installation Benefits
+- Add to home screen on any device
+- Offline menu browsing capability
+- Push notification support
+- Full-screen app experience
+- Faster loading times
+- Custom splash screens per role
+
+### Supported Devices
+- Android phones/tablets
+- iPhones/iPads
+- Windows/Mac computers
+- Any modern web browser
+
+### Install Pages
+- `/install` - General installation page
+- `/install/admin` - Admin-specific PWA setup
+- `/install/counter` - Counter-specific PWA setup
+- `/install/kitchen` - Kitchen-specific PWA setup
+- `/install/waiter` - Waiter-specific PWA setup
 
 ---
 
-## 🛎️ Waiter App
+## 🔊 Real-time Features
 
-### Mobile-First Order Taking
+### Live Synchronization
+- Orders appear instantly across all devices
+- Status changes reflect in real-time
+- Inventory updates sync immediately
+- Settings changes apply immediately
+- No manual refresh needed
 
-```
-┌────────────────────────────────────────────────────────────┐
-│                                                            │
-│  📱 WAITER MOBILE APP                                      │
-│                                                            │
-│  ┌──────────────────────────────────────────────────┐      │
-│  │  Quick PIN Login                                 │      │
-│  │  ───────────────                                 │      │
-│  │  Enter 4-digit PIN → Instant access              │      │
-│  └──────────────────────────────────────────────────┘      │
-│                                                            │
-│  ┌──────────────────────────────────────────────────┐      │
-│  │  Table Selection                                 │      │
-│  │  ─────────────────                               │      │
-│  │  Visual grid with table status                   │      │
-│  │  🟢 Empty  🟡 Ordering  🔴 Occupied               │      │
-│  └──────────────────────────────────────────────────┘      │
-│                                                            │
-│  ┌──────────────────────────────────────────────────┐      │
-│  │  Slide-Up Cart Panel                             │      │
-│  │  ───────────────────                             │      │
-│  │  • Swipe up to view cart                         │      │
-│  │  • Adjust quantities with +/- buttons            │      │
-│  │  • Add order notes                               │      │
-│  │  • Send to Kitchen with one tap                  │      │
-│  └──────────────────────────────────────────────────┘      │
-│                                                            │
-│  ┌──────────────────────────────────────────────────┐      │
-│  │  Ready Order Notifications                       │      │
-│  │  ─────────────────────────                       │      │
-│  │  • Sound alert when order is ready               │      │
-│  │  • Badge count for ready orders                  │      │
-│  │  • Quick view of orders to serve                 │      │
-│  └──────────────────────────────────────────────────┘      │
-│                                                            │
-└────────────────────────────────────────────────────────────┘
-```
+### Notifications
+- Audio alerts for new orders (customizable)
+- Visual badges for pending items
+- Waiter call notifications
+- Ready order alerts for waiters
+- Low stock warnings
 
-### Waiter Features
-
-| Feature | Description |
-|---------|-------------|
-| 🔢 **PIN Login** | Quick 4-digit PIN authentication |
-| 🗺️ **Table Grid** | Visual table selection with status colors |
-| 🛒 **Slide-Up Cart** | Mobile-friendly cart panel |
-| ➕ **Quantity Controls** | Easy +/- buttons for items |
-| 📝 **Order Notes** | Add special instructions |
-| 🔔 **Ready Alerts** | Sound notification for ready orders |
-| 📋 **Order Queue** | View all orders to serve |
-| 🌙 **Dark Mode** | Eye-friendly for any lighting |
+### Offline Resilience
+- Auto-reconnect when connection restores
+- Data refresh on reconnection
+- Connection status indicator
+- Graceful degradation
 
 ---
 
-## 💳 Payment Options
+## 📊 Business Intelligence
 
-### Currently Supported
+### Key Metrics Tracked
+- Daily/Weekly/Monthly revenue
+- Order counts and averages
+- Peak business hours
+- Top selling items
+- Customer frequency and lifetime value
+- Payment method preferences
+- Expense trends by category
+- Profit margins
 
-| Method | Status |
-|--------|--------|
-| 💵 Cash | ✅ Fully supported |
-| 📱 Fonepay | ✅ QR code generation |
-
-### Coming Soon
-
-- eSewa
-- Khalti
-- IME Pay
-- Card payments
-
----
-
-## 🌙 Dark Mode
-
-Perfect for evening shifts and ambient-lit restaurants:
-
-```
-┌─────────────────────────────────────────────────────────────┐
-│                                                             │
-│   LIGHT MODE                    DARK MODE                   │
-│   ──────────                    ─────────                   │
-│                                                             │
-│   ┌─────────────┐              ┌─────────────┐              │
-│   │ ⬜ White BG │              │ ⬛ Dark BG  │              │
-│   │ ⬛ Dark text│              │ ⬜ Light txt│              │
-│   │             │              │             │              │
-│   │ For daytime │              │ For evening │              │
-│   └─────────────┘              └─────────────┘              │
-│                                                             │
-│   Toggle in: Admin → Settings → Theme                       │
-│                                                             │
-└─────────────────────────────────────────────────────────────┘
-```
-
----
-
-## 📊 Analytics & Insights
-
-### Daily Dashboard
-
-- Total revenue
-- Number of orders
-- Unique customers
+### Customer Analytics
+- Total orders per customer
+- Total spending and tier
+- Favorite items
+- Days since last visit
 - Average order value
-- Comparison with previous period
 
-### Menu Performance
+### Insights Provided
+- Which items to promote
+- When to schedule more staff
+- Which customers are VIPs
+- Where money is being spent
+- Growth trends over time
 
-- Top 5 best sellers (with badges)
-- Least selling items
-- Category-wise breakdown
-- Item availability tracking
+---
 
-### Customer Insights
+## 🛠️ Technical Requirements
 
-- New vs returning customers
-- Visit frequency
-- Spending patterns
-- Loyalty point usage
+### Minimum Requirements
+- Stable internet connection
+- Any modern web browser (Chrome, Safari, Firefox, Edge)
+- Smartphone/tablet/computer
 
-### Peak Hours
+### Recommended Setup
+| Device | Use Case | Recommendation |
+|--------|----------|----------------|
+| Counter | Order management | Tablet or laptop with thermal printer |
+| Kitchen | Order display | Wall-mounted TV/monitor (32"+) |
+| Waiter | Table service | Smartphone |
+| Customer | Ordering | Their own phone |
 
-- Busiest times of day
-- Day-of-week trends
-- Rush hour detection (automatic wait time adjustment)
+### Printer Support
+- ESC/POS compatible thermal printers
+- USB or Network connection
+- Separate printers for kitchen and bar
 
 ---
 
 ## 🚀 Getting Started
 
-### What You Need
+### Step 1: Setup Database
+1. Create a Supabase project (free tier works)
+2. Run the provided `supabase/schema.sql`
+3. Note your Supabase URL and anon key
 
-1. ✅ Smartphone or tablet (any device works)
-2. ✅ Internet connection
-3. ✅ 30 minutes for initial setup
+### Step 2: Configure Application
+1. Deploy the application (Vercel, Netlify, etc.)
+2. Set environment variables for Supabase
+3. Access the app and login
 
-### What We Provide
+### Step 3: Initial Setup
+1. Login with default admin (admin/admin123)
+2. Change default passwords immediately
+3. Update restaurant settings (name, logo, tables)
+4. Add menu categories
+5. Add menu items with images
+6. Create staff accounts with appropriate roles
+7. Configure printer settings
 
-1. ✅ Complete system deployment
-2. ✅ Menu setup assistance
-3. ✅ Staff training
-4. ✅ QR codes for all tables
-5. ✅ Ongoing support
+### Step 4: Generate QR Codes
+1. Go to Admin → QR Code section
+2. Print QR codes for each table
+3. Place QR codes on tables
 
-### Timeline
-
-```
-Day 1: System setup & configuration
-Day 2: Menu entry & staff training
-Day 3: Go live! 🎉
-```
-
----
-
-## 💬 Testimonials
-
-> *"We saved 4 hours daily on order taking alone. Our kitchen runs smoother than ever."*
-> — Cafe Owner, Kathmandu
-
-> *"Customers love ordering from their phones. Tips have increased because we have more time to serve."*
-> — Restaurant Manager, Pokhara
-
-> *"The analytics helped us identify our best-selling items. We optimized our menu and increased profits by 20%."*
-> — Food Court Owner, Lalitpur
+### Step 5: Go Live
+1. Train staff on their interfaces
+2. Test the full order flow
+3. Start accepting customer orders!
 
 ---
 
-## ❓ Frequently Asked Questions
+## 💰 Cost Breakdown
 
-### Q: What if the internet goes down?
+### What You Need (Already Have)
+- Smartphones (staff already have)
+- Tablet for counter (optional, phone works)
+- Internet connection (already have)
 
-**A:** The menu loads offline for customers. Orders queue locally and sync when internet returns. Your business never stops.
+### Optional Investments
+- Wall-mounted TV for kitchen: Rs. 15,000-25,000
+- Thermal receipt printer: Rs. 5,000-10,000
+- Tablet for counter: Rs. 15,000-25,000
 
-### Q: Do I need to buy any equipment?
+### What's FREE
+- Sajilo Orders software
+- Supabase database (free tier: 500MB)
+- Image hosting via Cloudflare R2
+- All updates and features
 
-**A:** No! It works on any smartphone, tablet, or computer you already have.
-
-### Q: Can I use my own domain?
-
-**A:** Yes! We can set up `order.yourrestaurant.com` or any domain you prefer.
-
-### Q: Is my data secure?
-
-**A:** Yes. We use enterprise-grade encryption and secure cloud infrastructure (Supabase + Cloudflare).
-
-### Q: What about staff training?
-
-**A:** The interface is intuitive. Most staff learn it in under 30 minutes.
-
-### Q: Can I export my data?
-
-**A:** Yes! Export transactions, customer data, and more as CSV files anytime.
+### Total Investment: Rs. 0 to Rs. 60,000
+*Compare to traditional POS: Rs. 1,00,000+*
 
 ---
 
-## 📞 Ready to Transform Your Restaurant?
+## 💡 Why Choose Sajilo Orders?
 
-### Contact Us
+### For Restaurant Owners
+- **Zero Monthly Fees**: No subscription costs
+- **Zero Hardware Lock-in**: Works on any device
+- **Instant ROI**: Save paper, reduce errors, serve faster
+- **Data-Driven Decisions**: Analytics to grow your business
+- **Customer Loyalty**: Built-in points system
+- **Scalable**: Works for 5 tables or 50 tables
 
-- 📧 Email: [your-email]
-- 📱 Phone: [your-phone]
-- 💬 WhatsApp: [your-whatsapp]
+### For Staff
+- **Less Running**: Orders go directly to kitchen
+- **Fewer Errors**: Digital clarity, no handwriting issues
+- **Faster Service**: Real-time status updates
+- **Easy to Learn**: Intuitive, mobile-first interface
+- **Quick Login**: PIN-based access for waiters
 
-### Get Started Today
-
-1. Schedule a demo
-2. See it in action
-3. Go live in 3 days
-
----
-
-## 📋 Summary
-
-| Aspect | Traditional | Sajilo Orders |
-|--------|-------------|---------------|
-| **Setup Cost** | Rs. 50,000+ | Rs. 0 |
-| **Monthly Cost** | Rs. 5,000+ | Rs. 0 |
-| **Order Time** | 3-5 minutes | 30 seconds |
-| **Order Errors** | Common | Rare |
-| **Kitchen Delay** | Walking required | Instant |
-| **Daily Reports** | Manual, 1 hour | Automatic |
-| **Customer Data** | Not tracked | Complete history |
-| **Loyalty Program** | Expensive addon | Included |
-| **Scale Up** | Buy more hardware | Just add tables |
+### For Customers
+- **Convenience**: Order from phone, no waiting for waiter
+- **Transparency**: See menu with prices and images
+- **Control**: Add to cart, review, then order
+- **Loyalty Rewards**: Earn points on every order
+- **Real-time Updates**: Know exactly when food is ready
+- **Favorites**: Quick access to preferred items
 
 ---
 
-**Sajilo Orders POS** - *Order Made Simple*
+## 📞 Support & Documentation
 
-*Modern restaurant management for the digital age*
+### Included Documentation
+- `README.md` - Quick start guide
+- `TECHNICAL_SETUP_GUIDE.md` - Detailed technical setup
+- `DEPLOYMENT.md` - Deployment instructions
+- `PRINT_SERVER_GUIDE.md` - Printer configuration
+- `DATABASE_OPTIMIZATION.md` - Database tuning tips
+- `supabase/schema.sql` - Complete database schema
+
+### Quick Troubleshooting
+
+| Issue | Solution |
+|-------|----------|
+| Orders not appearing | Check internet connection, refresh page |
+| Printer not working | Verify printer configuration in settings |
+| QR not scanning | Ensure camera permissions granted |
+| Slow performance | Check internet speed, clear browser cache |
+| Login issues | Reset password, check username spelling |
 
 ---
 
-*© 2025 Sajilo Orders. All rights reserved.*
+## 🎯 Summary
+
+Sajilo Orders transforms restaurant operations with:
+
+✅ **Digital QR Ordering** - Customers order from their phones
+✅ **Kitchen Display System** - Real-time order management
+✅ **Waiter Mobile App** - Table service made efficient
+✅ **Complete POS** - Billing, payments, and reports
+✅ **Inventory Tracking** - Never run out of stock
+✅ **Customer Loyalty** - Automatic points and tiers
+✅ **Business Analytics** - Data to drive growth
+✅ **Multi-Device Sync** - Everything updates in real-time
+✅ **PWA Support** - Works like a native app
+✅ **Dual Printer Support** - Kitchen and bar separation
+✅ **Expense Tracking** - Complete accounting
+✅ **Monthly Reports** - PDF export for records
+✅ **Zero Cost** - Completely free to use
+
+---
+
+**Sajilo Orders** - *Making Restaurant Management Simple*
+
+*Developed with ❤️ for the Nepali food & beverage industry*
+
+---
+
+## Version History
+
+- **v3.1** - Current version with complete feature set
+- Inventory management with portions
+- Dual printer support
+- Enhanced KDS modes
+- Payment block system
+- Comprehensive reporting
+- PWA installation pages
