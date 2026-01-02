@@ -48,16 +48,20 @@ DROP FUNCTION IF EXISTS deduct_inventory(TEXT, NUMERIC, TEXT, TEXT) CASCADE;
 DROP FUNCTION IF EXISTS deduct_inventory_batch(JSONB, TEXT) CASCADE;
 DROP FUNCTION IF EXISTS get_unit_default_threshold(inventory_unit_type) CASCADE;
 DROP FUNCTION IF EXISTS cleanup_old_payment_blocks() CASCADE;
+DROP FUNCTION IF EXISTS cleanup_old_data() CASCADE;
 DROP FUNCTION IF EXISTS override_payment_block(INTEGER) CASCADE;
 DROP FUNCTION IF EXISTS record_payment_block(SMALLINT, VARCHAR) CASCADE;
 DROP FUNCTION IF EXISTS check_payment_block(SMALLINT, VARCHAR) CASCADE;
 DROP FUNCTION IF EXISTS get_daily_stats(DATE) CASCADE;
+DROP FUNCTION IF EXISTS get_daily_stats() CASCADE;
 DROP FUNCTION IF EXISTS get_active_orders_summary() CASCADE;
 DROP FUNCTION IF EXISTS archive_old_orders(INTEGER) CASCADE;
+DROP FUNCTION IF EXISTS archive_old_orders() CASCADE;
 DROP FUNCTION IF EXISTS get_customer_analytics(VARCHAR) CASCADE;
 DROP FUNCTION IF EXISTS update_updated_at_column() CASCADE;
 DROP FUNCTION IF EXISTS update_customer_stats() CASCADE;
 DROP FUNCTION IF EXISTS immutable_date(TIMESTAMPTZ) CASCADE;
+DROP FUNCTION IF EXISTS immutable_add_interval(TIMESTAMPTZ, INTERVAL) CASCADE;
 
 -- ===========================================
 -- HELPER FUNCTIONS (Must be created before tables)
@@ -70,6 +74,7 @@ RETURNS DATE
 LANGUAGE plpgsql
 IMMUTABLE
 PARALLEL SAFE
+SET search_path = public
 AS $$
 BEGIN
   RETURN (ts AT TIME ZONE 'UTC')::DATE;
@@ -82,6 +87,7 @@ RETURNS TIMESTAMPTZ
 LANGUAGE plpgsql
 IMMUTABLE
 PARALLEL SAFE
+SET search_path = public
 AS $$
 BEGIN
   RETURN ts + i;
@@ -409,12 +415,15 @@ CREATE INDEX idx_portion_lookup ON item_portion_prices(menu_item_id, portion_opt
 -- ===========================================
 
 CREATE OR REPLACE FUNCTION update_updated_at_column()
-RETURNS TRIGGER AS $$
+RETURNS TRIGGER
+LANGUAGE plpgsql
+SET search_path = public
+AS $$
 BEGIN
   NEW.updated_at = NOW();
   RETURN NEW;
 END;
-$$ LANGUAGE plpgsql;
+$$;
 
 CREATE TRIGGER update_orders_updated_at
   BEFORE UPDATE ON orders
@@ -426,9 +435,12 @@ CREATE TRIGGER update_inventory_updated_at
 
 -- Auto-update customer stats on transaction
 CREATE OR REPLACE FUNCTION update_customer_stats()
-RETURNS TRIGGER AS $$
+RETURNS TRIGGER
+LANGUAGE plpgsql
+SET search_path = public
+AS $$
 BEGIN
-  UPDATE customers 
+  UPDATE public.customers 
   SET 
     total_orders = total_orders + 1,
     total_spent = total_spent + NEW.total,
@@ -438,7 +450,7 @@ BEGIN
   );
   RETURN NEW;
 END;
-$$ LANGUAGE plpgsql;
+$$;
 
 CREATE TRIGGER auto_update_customer_stats
   AFTER INSERT ON transactions
@@ -502,7 +514,11 @@ RETURNS TABLE (
   digital_revenue NUMERIC,
   total_expenses NUMERIC,
   net_revenue NUMERIC
-) AS $$
+)
+LANGUAGE plpgsql
+STABLE
+SET search_path = public
+AS $$
 BEGIN
   RETURN QUERY
   WITH tx_stats AS (
@@ -511,18 +527,18 @@ BEGIN
       COUNT(*) as tx_count,
       COALESCE(SUM(t.total) FILTER (WHERE t.payment_method = 'cash'), 0) as cash,
       COALESCE(SUM(t.total) FILTER (WHERE t.payment_method != 'cash'), 0) as digital
-    FROM transactions t
+    FROM public.transactions t
     WHERE t.paid_date = target_date
   ),
   order_stats AS (
     SELECT COUNT(*) as order_count
-    FROM orders o
+    FROM public.orders o
     WHERE immutable_date(o.created_at) = target_date
       AND o.status NOT IN ('cancelled')
   ),
   expense_stats AS (
     SELECT COALESCE(SUM(e.amount), 0) as expenses
-    FROM expenses e
+    FROM public.expenses e
     WHERE e.expense_date = target_date
   )
   SELECT 
@@ -535,7 +551,7 @@ BEGIN
     ts.revenue - es.expenses
   FROM tx_stats ts, order_stats os, expense_stats es;
 END;
-$$ LANGUAGE plpgsql STABLE;
+$$;
 
 -- Get active orders summary for counter display
 CREATE OR REPLACE FUNCTION get_active_orders_summary()
@@ -545,7 +561,11 @@ RETURNS TABLE (
   preparing_count BIGINT,
   ready_count BIGINT,
   oldest_pending_minutes INTEGER
-) AS $$
+)
+LANGUAGE plpgsql
+STABLE
+SET search_path = public
+AS $$
 BEGIN
   RETURN QUERY
   SELECT 
@@ -553,39 +573,42 @@ BEGIN
     COUNT(*) FILTER (WHERE o.status = 'accepted'),
     COUNT(*) FILTER (WHERE o.status = 'preparing'),
     COUNT(*) FILTER (WHERE o.status = 'ready'),
-    EXTRACT(EPOCH FROM (NOW() - MIN(o.created_at) FILTER (WHERE o.status = 'pending')))::INTEGER / 60
-  FROM orders o
+    COALESCE(EXTRACT(EPOCH FROM (NOW() - MIN(o.created_at) FILTER (WHERE o.status = 'pending')))::INTEGER / 60, 0)
+  FROM public.orders o
   WHERE o.status IN ('pending', 'accepted', 'preparing', 'ready');
 END;
-$$ LANGUAGE plpgsql STABLE;
+$$;
 
 -- Batch inventory deduction (single transaction for order)
 CREATE OR REPLACE FUNCTION deduct_inventory_batch(
   p_items JSONB,
   p_order_id TEXT
 )
-RETURNS BOOLEAN AS $$
+RETURNS BOOLEAN
+LANGUAGE plpgsql
+SET search_path = public
+AS $$
 DECLARE
   item RECORD;
   inv_id TEXT;
 BEGIN
   FOR item IN SELECT * FROM jsonb_to_recordset(p_items) AS x(menu_item_id TEXT, quantity NUMERIC, unit TEXT)
   LOOP
-    SELECT ii.id INTO inv_id FROM inventory_items ii WHERE ii.menu_item_id = item.menu_item_id;
+    SELECT ii.id INTO inv_id FROM public.inventory_items ii WHERE ii.menu_item_id = item.menu_item_id;
     
     IF inv_id IS NOT NULL THEN
-      UPDATE inventory_items 
+      UPDATE public.inventory_items 
       SET current_stock = current_stock - item.quantity
       WHERE id = inv_id;
       
-      INSERT INTO inventory_transactions (id, inventory_item_id, transaction_type, quantity, unit, order_id)
+      INSERT INTO public.inventory_transactions (id, inventory_item_id, transaction_type, quantity, unit, order_id)
       VALUES (uuid_generate_v4()::text, inv_id, 'sale', -item.quantity, item.unit::inventory_unit_type, p_order_id);
     END IF;
   END LOOP;
   
   RETURN TRUE;
 END;
-$$ LANGUAGE plpgsql;
+$$;
 
 -- Get low stock items (optimized with generated column)
 CREATE OR REPLACE FUNCTION get_low_stock_items()
@@ -596,7 +619,11 @@ RETURNS TABLE (
   threshold NUMERIC,
   unit inventory_unit_type,
   stock_status VARCHAR
-) AS $$
+)
+LANGUAGE plpgsql
+STABLE
+SET search_path = public
+AS $$
 BEGIN
   RETURN QUERY
   SELECT 
@@ -606,8 +633,8 @@ BEGIN
     COALESCE(ii.low_stock_threshold, 10)::NUMERIC,
     ii.unit,
     ii.stock_status
-  FROM inventory_items ii
-  JOIN menu_items mi ON ii.menu_item_id = mi.id
+  FROM public.inventory_items ii
+  JOIN public.menu_items mi ON ii.menu_item_id = mi.id
   WHERE ii.stock_status != 'ok'
   ORDER BY 
     CASE ii.stock_status
@@ -617,11 +644,15 @@ BEGIN
     END,
     ii.current_stock ASC;
 END;
-$$ LANGUAGE plpgsql STABLE;
+$$;
 
 -- Get unit default threshold
 CREATE OR REPLACE FUNCTION get_unit_default_threshold(p_unit inventory_unit_type)
-RETURNS NUMERIC AS $$
+RETURNS NUMERIC
+LANGUAGE sql
+IMMUTABLE
+SET search_path = public
+AS $$
 SELECT CASE p_unit
   WHEN 'ml' THEN 500
   WHEN 'liter' THEN 2
@@ -632,49 +663,62 @@ SELECT CASE p_unit
   WHEN 'pack' THEN 3
   ELSE 10
 END::NUMERIC;
-$$ LANGUAGE sql IMMUTABLE;
+$$;
 
 -- Payment block functions
 CREATE OR REPLACE FUNCTION check_payment_block(p_table SMALLINT, p_phone VARCHAR)
-RETURNS TABLE (is_blocked BOOLEAN, paid_at TIMESTAMPTZ, block_id INTEGER) AS $$
+RETURNS TABLE (is_blocked BOOLEAN, paid_at TIMESTAMPTZ, block_id INTEGER)
+LANGUAGE sql
+STABLE
+SET search_path = public
+AS $$
   SELECT TRUE, pb.paid_at, pb.id
-  FROM payment_blocks pb
+  FROM public.payment_blocks pb
   WHERE pb.table_number = p_table
     AND pb.customer_phone = p_phone
     AND pb.paid_at > NOW() - INTERVAL '3 hours'
     AND pb.staff_override = FALSE
   ORDER BY pb.paid_at DESC
   LIMIT 1;
-$$ LANGUAGE sql STABLE;
+$$;
 
 CREATE OR REPLACE FUNCTION record_payment_block(p_table SMALLINT, p_phone VARCHAR)
-RETURNS INTEGER AS $$
-  INSERT INTO payment_blocks (table_number, customer_phone)
+RETURNS INTEGER
+LANGUAGE sql
+SET search_path = public
+AS $$
+  INSERT INTO public.payment_blocks (table_number, customer_phone)
   VALUES (p_table, p_phone)
   RETURNING id;
-$$ LANGUAGE sql;
+$$;
 
 CREATE OR REPLACE FUNCTION override_payment_block(p_id INTEGER)
-RETURNS BOOLEAN AS $$
-  UPDATE payment_blocks SET staff_override = TRUE, override_at = NOW() WHERE id = p_id RETURNING TRUE;
-$$ LANGUAGE sql;
+RETURNS BOOLEAN
+LANGUAGE sql
+SET search_path = public
+AS $$
+  UPDATE public.payment_blocks SET staff_override = TRUE, override_at = NOW() WHERE id = p_id RETURNING TRUE;
+$$;
 
 -- Archive old orders (run weekly via cron)
 CREATE OR REPLACE FUNCTION archive_old_orders(days_old INTEGER DEFAULT 30)
-RETURNS INTEGER AS $$
+RETURNS INTEGER
+LANGUAGE plpgsql
+SET search_path = public
+AS $$
 DECLARE
   deleted INTEGER;
 BEGIN
-  DELETE FROM orders 
+  DELETE FROM public.orders 
   WHERE status IN ('served', 'cancelled') 
     AND created_at < NOW() - (days_old || ' days')::INTERVAL;
   GET DIAGNOSTICS deleted = ROW_COUNT;
   
-  DELETE FROM payment_blocks WHERE expires_at < NOW();
+  DELETE FROM public.payment_blocks WHERE expires_at < NOW();
   
   RETURN deleted;
 END;
-$$ LANGUAGE plpgsql;
+$$;
 
 -- Customer analytics for loyalty
 CREATE OR REPLACE FUNCTION get_customer_analytics(p_phone VARCHAR)
@@ -688,7 +732,11 @@ RETURNS TABLE (
   avg_order_value NUMERIC,
   days_since_last_visit INTEGER,
   favorite_items JSONB
-) AS $$
+)
+LANGUAGE plpgsql
+STABLE
+SET search_path = public
+AS $$
 BEGIN
   RETURN QUERY
   SELECT 
@@ -704,7 +752,7 @@ BEGIN
       (SELECT jsonb_agg(item_name ORDER BY cnt DESC)
        FROM (
          SELECT item->>'name' as item_name, COUNT(*) as cnt
-         FROM transactions t,
+         FROM public.transactions t,
               jsonb_array_elements(t.items) as item
          WHERE t.customer_phones ? c.phone
          GROUP BY item->>'name'
@@ -712,10 +760,10 @@ BEGIN
        ) top_items
       ), '[]'::JSONB
     )
-  FROM customers c
+  FROM public.customers c
   WHERE c.phone = p_phone;
 END;
-$$ LANGUAGE plpgsql STABLE;
+$$;
 
 -- Item portion prices helper
 CREATE OR REPLACE FUNCTION get_item_portion_prices(p_menu_item_id TEXT)
@@ -725,7 +773,11 @@ RETURNS TABLE (
   portion_size NUMERIC,
   price NUMERIC,
   is_item_specific BOOLEAN
-) AS $$
+)
+LANGUAGE plpgsql
+STABLE
+SET search_path = public
+AS $$
 BEGIN
   RETURN QUERY
   SELECT 
@@ -734,15 +786,15 @@ BEGIN
     po.size,
     COALESCE(ipp.price, po.fixed_price, 0)::NUMERIC,
     ipp.id IS NOT NULL
-  FROM menu_items mi
-  JOIN inventory_items ii ON ii.menu_item_id = mi.id
-  JOIN inventory_categories ic ON mi.category = (SELECT c.name FROM categories c WHERE c.id = ic.category_id)
-  JOIN portion_options po ON po.inventory_category_id = ic.id
-  LEFT JOIN item_portion_prices ipp ON ipp.menu_item_id = mi.id AND ipp.portion_option_id = po.id
+  FROM public.menu_items mi
+  JOIN public.inventory_items ii ON ii.menu_item_id = mi.id
+  JOIN public.inventory_categories ic ON mi.category = (SELECT c.name FROM public.categories c WHERE c.id = ic.category_id)
+  JOIN public.portion_options po ON po.inventory_category_id = ic.id
+  LEFT JOIN public.item_portion_prices ipp ON ipp.menu_item_id = mi.id AND ipp.portion_option_id = po.id
   WHERE mi.id = p_menu_item_id
   ORDER BY po.sort_order;
 END;
-$$ LANGUAGE plpgsql STABLE;
+$$;
 
 -- ===========================================
 -- API ACCESS (Grants) + REALTIME SETUP
